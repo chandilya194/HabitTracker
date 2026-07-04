@@ -125,7 +125,7 @@ export default function ReportsPage() {
       { day: "Sun", rating: 4.3 },
     ]
   }, [])
-
+  //vdisyvsyivyvs
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-6 md:pl-20 lg:pl-64">
       {/* Header */}
@@ -137,10 +137,10 @@ export default function ReportsPage() {
               Track your progress and performance
             </p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={signOut} 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
             className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-xs font-semibold rounded-full px-4 h-9"
           >
             Sign Out
