@@ -216,9 +216,18 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     
     return get().tasks
       .filter((task) => {
-        // For one-time tasks, check exact date match
+        // For one-time tasks:
+        // - If completed, it only appears on the completion date.
+        // - If not completed, it rolls over to any date >= its scheduled date.
         if (task.type === "onetime") {
-          return task.date === dateStr
+          if (task.completed) {
+            const completion = get().completions.find(
+              (c) => c.taskId === task.id && c.completed
+            )
+            const completedDateStr = completion ? completion.date : task.date
+            return completedDateStr === dateStr
+          }
+          return task.date <= dateStr
         }
         
         // For recurring tasks, check if they should appear on this day
@@ -233,9 +242,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         return false
       })
       .map((task) => {
-        // For routine tasks, resolve completed status and satisfactionRating for this specific date
+        // For one-time tasks, check completions mapping to make sure it shows completed status correctly on the completion date.
         if (task.type === "onetime") {
-          return task
+          const completion = get().completions.find(
+            (c) => c.taskId === task.id && c.date === dateStr
+          )
+          return {
+            ...task,
+            completed: completion ? completion.completed : task.completed,
+            satisfactionRating: completion ? completion.satisfactionRating : task.satisfactionRating,
+          }
         }
         const completion = get().completions.find(
           (c) => c.taskId === task.id && c.date === dateStr
@@ -360,6 +376,9 @@ if (db && auth && typeof window !== "undefined") {
           // Map database tasks to include today's completion status
           const todayStr = new Date().toISOString().split("T")[0]
           const mappedTasks = dbTasks.map((task) => {
+            if (task.type === "onetime") {
+              return task
+            }
             const todayCompletion = dbCompletions.find(
               (c) => c.taskId === task.id && c.date === todayStr
             )

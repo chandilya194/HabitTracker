@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { CheckSquare, BarChart3 } from "lucide-react"
+import { CheckSquare, BarChart3, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -10,6 +10,11 @@ const navItems = [
     label: "Tasks",
     href: "/",
     icon: CheckSquare,
+  },
+  {
+    label: "Notes",
+    href: "/notes",
+    icon: FileText,
   },
   {
     label: "Reports",

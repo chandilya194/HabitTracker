@@ -41,3 +41,12 @@ export interface MonthlyHistory {
   totalEarned: number
   totalPossible: number
 }
+
+export interface Note {
+  id: string
+  title: string
+  content: string
+  color: string // Tailwind bg class color code
+  createdAt: string
+  updatedAt: string
+}

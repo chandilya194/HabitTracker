@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { useTaskStore } from "@/lib/task-store"
 import { CalendarStrip } from "@/components/calendar-strip"
 import { TaskCard } from "@/components/task-card"
@@ -91,6 +92,14 @@ export default function TasksPage() {
   
   const incompleteTasks = sortedTasks.filter(t => !t.completed)
   const completedTasks = sortedTasks.filter(t => t.completed)
+  
+  const isPastDate = () => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const compareDate = new Date(selectedDate)
+    compareDate.setHours(0, 0, 0, 0)
+    return compareDate < today
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-6 md:pl-20 lg:pl-64">
@@ -140,8 +149,11 @@ export default function TasksPage() {
           <div className="space-y-6">
             {incompleteTasks.length > 0 && (
               <div className="space-y-3">
-                <h2 className="text-sm font-medium text-muted-foreground">
-                  To Do ({incompleteTasks.length})
+                <h2 className={cn(
+                  "text-sm font-medium",
+                  isPastDate() ? "text-destructive font-semibold" : "text-muted-foreground"
+                )}>
+                  {isPastDate() ? "Not Completed" : "To Do"} ({incompleteTasks.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {incompleteTasks.map((task) => (
@@ -151,6 +163,7 @@ export default function TasksPage() {
                       onComplete={completeTask}
                       onEdit={handleEdit}
                       onDelete={deleteTask}
+                      isMissed={isPastDate()}
                     />
                   ))}
                 </div>

@@ -13,11 +13,12 @@ interface TaskCardProps {
   onComplete: (id: string, rating?: number) => void
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
+  isMissed?: boolean
 }
 
-export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onComplete, onEdit, onDelete, isMissed }: TaskCardProps) {
   const [showRating, setShowRating] = useState(false)
-  
+
   const getTaskStyles = () => {
     switch (task.type) {
       case "onetime":
@@ -30,7 +31,7 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
         return "bg-card border-border"
     }
   }
-  
+
   const getTypeLabel = () => {
     switch (task.type) {
       case "onetime":
@@ -43,7 +44,7 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
         return ""
     }
   }
-  
+
   const getTypeIcon = () => {
     if (task.type === "routine-single") {
       return <Star className="h-3 w-3 fill-current" />
@@ -59,7 +60,7 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
     }
     return null
   }
-  
+
   const handleCompleteClick = () => {
     if (task.type === "routine-satisfaction" && !task.completed) {
       setShowRating(true)
@@ -67,12 +68,12 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
       onComplete(task.id)
     }
   }
-  
+
   const handleRatingSubmit = (rating: number) => {
     onComplete(task.id, rating)
     setShowRating(false)
   }
-  
+
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(":")
     const hour = parseInt(hours)
@@ -80,16 +81,17 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
     const hour12 = hour % 12 || 12
     return `${hour12}:${minutes} ${ampm}`
   }
-  
+
   return (
     <>
       <Card className={cn(
-        "border-l-4 transition-all",
-        getTaskStyles(),
-        task.completed && "opacity-60"
+        "border-l-4 transition-all py-0",
+        isMissed ? "bg-red-500/10 border-red-500/60 dark:bg-red-950/20 dark:border-red-900/60 text-red-900 dark:text-red-200" : getTaskStyles(),
+        task.completed && "opacity-60",
+        isMissed && "opacity-65"
       )}>
         <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className={cn(
@@ -102,24 +104,26 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
                   {getTypeIcon()}
                 </span>
               </div>
-              
+
               <h3 className={cn(
                 "font-semibold text-foreground",
                 task.completed && "line-through"
               )}>
                 {task.name}
               </h3>
-              
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {task.description}
-              </p>
-              
+
+              {task.description && (
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  {task.description}
+                </p>
+              )}
+
               <div className="flex items-center gap-3 mt-3 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
                   <span>{formatTime(task.time)}</span>
                 </div>
-                
+
                 {task.completed && task.satisfactionRating && (
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -137,8 +141,8 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
                 )}
               </div>
             </div>
-            
-            <div className="flex flex-col gap-1">
+
+            <div className="flex flex-row items-center gap-1">
               {!task.completed && (
                 <Button
                   variant="ghost"
@@ -172,7 +176,7 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
           </div>
         </CardContent>
       </Card>
-      
+
       <RatingModal
         open={showRating}
         onOpenChange={setShowRating}
