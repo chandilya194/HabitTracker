@@ -107,7 +107,7 @@ export function TaskCard({ task, onComplete, onEdit, onDelete, isMissed }: TaskC
 
               <h3 className={cn(
                 "font-semibold text-foreground",
-                task.completed && "line-through"
+                isMissed && "line-through"
               )}>
                 {task.name}
               </h3>
